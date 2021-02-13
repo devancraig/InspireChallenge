@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "dgSpecHash": "yqgLm5cRVnOd267DuZR8liAwC9oA7/NeGQ96spgY/XJdAF3KLfMZPMSefx3bKiJv8AXa30a6YDktP8/bBgq6GA==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\devan\\source\\repos\\InspireChallenge\\Services\\Services.csproj",
+  "expectedPackageFiles": [
+    "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder\\microsoft.netcore.platforms\\1.1.0\\microsoft.netcore.platforms.1.1.0.nupkg.sha512",
+    "C:\\Users\\devan\\.nuget\\packages\\netstandard.library\\2.0.3\\netstandard.library.2.0.3.nupkg.sha512",
+    "C:\\Users\\devan\\.nuget\\packages\\newtonsoft.json\\12.0.3\\newtonsoft.json.12.0.3.nupkg.sha512"
+  ],
+  "logs": []
+}

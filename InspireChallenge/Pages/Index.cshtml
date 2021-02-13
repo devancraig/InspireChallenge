@@ -1,0 +1,51 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+
+}
+
+<style>
+    body {
+        /* The image used */
+        background-image: url( @(Model.image.url) );
+        /* Full height */
+        height: 100%;
+        /* Center and scale the image nicely */
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: cover;
+    }
+    .grid-stack {
+        background: #FAFAD2;
+    }
+
+    .grid-stack-item-content {
+        background-color: #18BC9C;
+    }
+</style>
+
+<div class="text-center">
+
+
+    <h2>Weather</h2>
+    <h3>
+        @Model.weather.main.temp
+    </h3>
+    <p>Low: @Model.weather.main.temp_min</p>
+    <p>High: @Model.weather.main.temp_max</p>
+
+    <h2>Quotes</h2>
+    @foreach (var item in Model.quotes)
+    {
+        //Check sanitization
+        @Html.Raw(item.content.rendered)
+        <p>- @item.title.rendered </p>
+    }
+
+</div>
+
+<script type="text/javascript">
+    
+</script>
+
