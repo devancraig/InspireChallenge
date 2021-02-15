@@ -1,0 +1,9 @@
+C:\Users\devan\source\repos\InspireChallenge\Services\bin\Debug\netstandard2.0\Services.deps.json
+C:\Users\devan\source\repos\InspireChallenge\Services\bin\Debug\netstandard2.0\Services.dll
+C:\Users\devan\source\repos\InspireChallenge\Services\bin\Debug\netstandard2.0\Services.pdb
+C:\Users\devan\source\repos\InspireChallenge\Services\obj\Debug\netstandard2.0\Services.csprojAssemblyReference.cache
+C:\Users\devan\source\repos\InspireChallenge\Services\obj\Debug\netstandard2.0\Services.AssemblyInfoInputs.cache
+C:\Users\devan\source\repos\InspireChallenge\Services\obj\Debug\netstandard2.0\Services.AssemblyInfo.cs
+C:\Users\devan\source\repos\InspireChallenge\Services\obj\Debug\netstandard2.0\Services.csproj.CoreCompileInputs.cache
+C:\Users\devan\source\repos\InspireChallenge\Services\obj\Debug\netstandard2.0\Services.dll
+C:\Users\devan\source\repos\InspireChallenge\Services\obj\Debug\netstandard2.0\Services.pdb
