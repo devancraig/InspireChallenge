@@ -23,7 +23,6 @@ namespace InspireChallenge.Pages
         {
             _service = service;
             quotes = _service.GetQuote();
-            weather = _service.GetWeather("Boise", "ID", "US", 0);
             image = _service.GetRandomImage();
             counter = 0;
         }
@@ -33,7 +32,7 @@ namespace InspireChallenge.Pages
             return new OkObjectResult(image);
         }
 
-        public IActionResult OnGetChangeWeather(string city, string stateID, string countryID, int tempType)
+        public IActionResult OnGetChangeWeather(string city, string stateID, string countryID, string tempType)
         {
             weather = _service.GetWeather(city, stateID, countryID, tempType);
             return new OkObjectResult(weather);

@@ -5,20 +5,18 @@
     DateTime localDate = DateTime.Now;
 
     int index = Model.counter;
-    //int hour = localDate.Hour;
-    int hour = 12;
+    int hour = localDate.Hour;
     string timeMessage = "Good Morning";
     string widgetColor = "#fcd14d";
     if (hour >= 12 && hour < 17) { timeMessage = "Good Afternoon"; widgetColor = "#EF810E"; }
     if (hour >= 17 && hour < 22) { timeMessage = "Good Evening"; widgetColor = "#053752"; }
     if (hour >= 22 && hour < 24) { timeMessage = "Good Night"; widgetColor = "#001A26"; }
     if (hour >= 0 && hour < 6) { timeMessage = "Good Night"; widgetColor = "#001A26"; }
-    string iconURL = "http://openweathermap.org/img/wn/";
-    string iconType = ".png";
 
 }
 
-<style>
+@section Head {
+    <style>
     body {
         /* The image used */
         background-image: url(@(Model.image.url));
@@ -63,7 +61,9 @@
         color: white;
     }
 
-</style>
+    </style>
+}
+
 
 <div class="text-center">
 
@@ -72,15 +72,15 @@
         <div id="drag-1" class="draggable">
             <div class="row weather">
                 <div class="col">
-                    <h3 id="set-weather">@Model.weather.main.temp<span>&#8457;</span></h3>
-                    <p id="set-weather-min">Low: @Model.weather.main.temp_min</p>
-                    <p id="set-weather-max">High: @Model.weather.main.temp_max</p>
+                    <h3 id="set-weather"></h3>
+                    <p id="set-weather-min"></p>
+                    <p id="set-weather-max"></p>
                 </div>
                 <div class="col">
-                    <img src="@(iconURL)@(Model.weather.weather[0].icon)@(iconType)" />
-                    <p>@(Model.weather.weather[0].description)</p>
-                    <button id="changeTempF"><span>&#8457;</span></button>
-                    <button id="changeTempC"><span>&#8451;</span></button>
+                    <img id="set-weather-image" />
+                    <p id="set-weather-desc"></p>
+                    <button id="changeTempF"></button>
+                    <button id="changeTempC"></button>
                 </div>
             </div>
         </div>
@@ -105,162 +105,201 @@
             <button id="changeBackground" class="btn">New Image?</button>
         </div>
     </div>
-    
+
 </div>
 
-<script type="text/javascript">
-    // target elements with the "draggable" class
-    interact('.draggable')
-        .draggable({
-            // enable inertial throwing
-            inertia: true,
-            // keep the element within the area of it's parent
-            modifiers: [
-                interact.modifiers.restrictRect({
-                    restriction: 'parent',
-                    endOnly: true
-                })
-            ],
-            // enable autoScroll
-            autoScroll: true,
+@section Scripts {
+    <script>
+    var dragEvents = (function () {
+            function initialize() {
+                window.dragMoveListener = dragMoveListener;
 
-            listeners: {
-                // call this function on every dragmove event
-                move: dragMoveListener,
+                interact('.draggable')
+                    .draggable({
+                        // enable inertial throwing
+                        inertia: true,
+                        // keep the element within the area of it's parent
+                        modifiers: [
+                            interact.modifiers.restrictRect({
+                                restriction: 'parent',
+                                endOnly: true
+                            })
+                        ],
+                        // enable autoScroll
+                        autoScroll: true,
 
-                // call this function on every dragend event
-                //end(event) {
-                //    var textEl = event.target.querySelector('p')
+                        listeners: {
+                            // call this function on every dragmove event
+                            move: dragMoveListener,
 
-                //    textEl && (textEl.textContent =
-                //        'moved a distance of ' +
-                //        (Math.sqrt(Math.pow(event.pageX - event.x0, 2) +
-                //            Math.pow(event.pageY - event.y0, 2) | 0))
-                //            .toFixed(2) + 'px')
-                //}
+                        }
+                    })
+           }
+
+
+
+           function dragMoveListener(event) {
+               var target = event.target
+               // keep the dragged position in the data-x/data-y attributes
+               var x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx
+               var y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy
+
+               // translate the element
+               target.style.webkitTransform =
+                   target.style.transform =
+                   'translate(' + x + 'px, ' + y + 'px)'
+
+               // update the posiion attributes
+               target.setAttribute('data-x', x)
+               target.setAttribute('data-y', y)
+           }
+
+            return {
+                Init: initialize
             }
-        })
+    })();
 
-    function dragMoveListener(event) {
-        var target = event.target
-        // keep the dragged position in the data-x/data-y attributes
-        var x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx
-        var y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy
+    var currentPage = (function () {
+        //Global Variables
+        var timer;
+        var clockFormat;
+        var currentQuote = @(index);
+        var city;
+        var stateID;
+        var countryID;
+        function initialize() {
+                 startClock(0);
+                 getLocation("imperial");
 
-        // translate the element
-        target.style.webkitTransform =
-            target.style.transform =
-            'translate(' + x + 'px, ' + y + 'px)'
+                $('#changeBackground').click(function () {
+                    updateBackground();
+                });
 
-        // update the posiion attributes
-        target.setAttribute('data-x', x)
-        target.setAttribute('data-y', y)
-    }
+                $('#changeTempC').click(function () {
+                    updateTemp("metric");
+                });
 
-    // this function is used later in the resizing and gesture demos
-    window.dragMoveListener = dragMoveListener
-</script>
+                $('#changeTempF').click(function () {
+                    updateTemp("imperial");
+                });
 
-<script>
-    //Global Variables
-    var timer;
-    var clockFormat;
-    var currentQuote = @(index);
+                $('#updateQuote').click(function () {
+                    changeQuote();
+                });
 
-    /* Change Background Image */
-    function updateBackground() {
-        // Uses the server as a rest api to call my RandomImage function
-        $.get("?handler=RandomImage").then(function (d) {
-            $("body").css("background-image", "url(" + d.url + ")");
-        });
-    }
-
-    $('#changeBackground').click(function () {
-        updateBackground();
-    });
-
-    /* Change Temperature */
-    function updateTemp(tempType) {
-        // Local Variables
-        var city = "Boise";
-        var stateID = "ID";
-        var countryID = "US";
-        var symbol = tempType == 0 ? symbol = "<span>&#8457;</span>" : symbol = "<span>&#8451;</span>";
-
-        // Uses the server as a rest api to call my ChangeWeather function
-        $.get("?handler=ChangeWeather", { city: city, stateID: stateID, countryID: countryID, tempType: tempType }).then(function (d) {
-            $("#set-weather").html(d.main.temp + symbol);
-            $("#set-weather-min").html("Low: " + d.main.temp_min);
-            $("#set-weather-max").html("High: " + d.main.temp_max);
-        });
-    }
-    
-    $('#changeTempC').click(function () {
-        updateTemp(1);
-    });
-
-    $('#changeTempF').click(function () {
-        updateTemp(0);
-    });
-
-    /* Change Quote */
-    function changeQuote() {
-        // Local Variables
-        var quotes = @(Json.Serialize(Model.quotes));
-        var quoteLength = @(Model.quotes.Count);
-
-        currentQuote++; // Increment quote index
-        currentQuote = currentQuote >= quoteLength ? currentQuote = 0 : currentQuote; //Check quote length
-        var quote = quotes[currentQuote];
-        $('#quote-content').html(quote.content.rendered);
-        $('#title').html(quote.title.rendered);
-    };
-
-    $('#updateQuote').click(function () {
-        changeQuote();
-    });
-
-    /* Clock Functionality */
-    function startClock(format) {
-        var d = new Date();
-        ap = "am";
-        h = d.getHours();
-        m = d.getMinutes();
-        s = d.getSeconds();
-        if (format == 0) {
-            clockFormat = 0;
-            if (h > 11) { ap = "pm"; }
-            if (h > 12) { h = h - 12; }
-            if (h == 0) { h = 12; }
-            if (m < 10) { m = "0" + m; }
-            if (s < 10) { s = "0" + s; }
-            $('#change').html("12 Hour Clock");
-            $('#time').html(h + ":" + m + ":" + s + " " + ap);
-        } else {
-            clockFormat = 1;
-            if (m < 10) { m = "0" + m; }
-            if (s < 10) { s = "0" + s; }
-            $('#change').html("Military Time");
-            $('#time').html(h + ":" + m + ":" + s);
+                 $('#change').click(function () {
+                     clearInterval(timer);
+                     if (clockFormat == 0) {
+                         startClock(1);
+                     } else {
+                         startClock(0);
+                     }
+                 });
         }
 
-        timer = setTimeout(function () {
-            startClock(format);
-        }, 500);
-    };
-
-    $('#change').click(function () {
-        clearInterval(timer);
-        if (clockFormat == 0) {
-            startClock(1);
-        } else {
-            startClock(0);
+         /* Change Background Image */
+        function updateBackground() {
+            // Uses the server as a rest api to call my RandomImage function
+            $.get("?handler=RandomImage").then(function (d) {
+                $("body").css("background-image", "url(" + d.url + ")");
+            });
         }
 
+        /* Grab Location For Weather */
+        function getLocation(tempType) {
+            if (navigator.geolocation) {
+                $.ajax({
+                    url: "https://geolocation-db.com/jsonp",
+                    jsonpCallback: "callback",
+                    dataType: "jsonp",
+                    success: function (location) {
+                        countryID = location.country_code;
+                        city = location.city;
+                        stateID = "ID";
+                        //location.state
+                        updateTemp(tempType);
+                    }
+                });
+            } else {
+                //Defualts
+                countryID = "US";
+                stateID = "TX";
+                city = "Dallas";
+                updateTemp(tempType);
+            }
+        }
+
+        /* Change Temperature */
+        function updateTemp(tempType) {
+            // Local Variables
+            var iconURL = "https://openweathermap.org/img/wn/";
+            var iconType = ".png";
+
+            var symbol = tempType == "imperial" ? symbol = "<span>&#8457;</span>" : symbol = "<span>&#8451;</span>";
+
+            // Uses the server as a rest api to call my ChangeWeather function
+            $.get("?handler=ChangeWeather", { city: city, stateID: stateID, countryID: countryID, tempType: tempType }).then(function (d) {
+                $("#set-weather").html(d.main.temp.toFixed(0) + symbol);
+                $("#set-weather-min").html("Low: " + d.main.temp_min.toFixed(0));
+                $("#set-weather-max").html("High: " + d.main.temp_max.toFixed(0));
+                $("#set-weather-image").attr("src", iconURL + d.weather[0].icon + iconType);
+                $("#set-weather-desc").html(d.weather[0].description);
+                $("#changeTempF").html("<span>&#8457;</span>");
+                $("#changeTempC").html("<span>&#8451;</span>");
+
+            });
+         }
+
+        /* Clock Functionality */
+        function startClock(format) {
+             var d = new Date();
+             ap = "am";
+             h = d.getHours();
+             m = d.getMinutes();
+             s = d.getSeconds();
+             if (format == 0) {
+                 clockFormat = 0;
+                 if (h > 11) { ap = "pm"; }
+                 if (h > 12) { h = h - 12; }
+                 if (h == 0) { h = 12; }
+                 if (m < 10) { m = "0" + m; }
+                 if (s < 10) { s = "0" + s; }
+                 $('#change').html("12 Hour Clock");
+                 $('#time').html(h + ":" + m + ":" + s + " " + ap);
+             } else {
+                 clockFormat = 1;
+                 if (m < 10) { m = "0" + m; }
+                 if (s < 10) { s = "0" + s; }
+                 $('#change').html("Military Time");
+                 $('#time').html(h + ":" + m + ":" + s);
+             }
+             timer = setTimeout(function () {
+                 startClock(format);
+             }, 500);
+         };
+
+        /* Change Quote */
+        function changeQuote() {
+            // Local Variables
+            var quotes = @(Json.Serialize(Model.quotes));
+            var quoteLength = @(Model.quotes.Count);
+
+            currentQuote++; // Increment quote index
+            currentQuote = currentQuote >= quoteLength ? currentQuote = 0 : currentQuote; //Check quote length
+            var quote = quotes[currentQuote];
+            $('#quote-content').html(quote.content.rendered);
+            $('#title').html(quote.title.rendered);
+        };
+
+                return {
+                    Init: initialize
+                }
+     })();
+
+    $(document).ready(function () {
+        currentPage.Init();
+        dragEvents.Init();
     });
+    </script>
+}
 
-    window.onload = function () {
-        startClock(0);
-    };
-
-</script>

@@ -9,6 +9,11 @@ namespace Services
 {
     public class ServiceAPI
     {
+        private string _weatherKey;
+        public ServiceAPI(string key)
+        {
+            _weatherKey = key;
+        }
         public ImageObject GetRandomImage()
         {
             ImageObject image;
@@ -44,10 +49,12 @@ namespace Services
             return quote;
         }
 
-        public WeatherObject GetWeather(string city, string stateID, string countryID, int tempType)
+
+
+        public WeatherObject GetWeather(string city, string stateID, string countryID, string tempType)
         {
             WeatherObject weather;
-            string reqUrl = $"http://api.openweathermap.org/data/2.5/weather?q={city},{stateID},{countryID}&appid=cc51c0c36de75e4ff442f7f4337d2190&units=standard";
+            string reqUrl = $"https://api.openweathermap.org/data/2.5/weather?q={city},{stateID},{countryID}&appid={_weatherKey}&units={tempType}";
             var httpWebRequestQR = (HttpWebRequest)WebRequest.Create(reqUrl);
             httpWebRequestQR.ContentType = "application/json";
             httpWebRequestQR.Method = "GET";
@@ -59,30 +66,9 @@ namespace Services
                 string jsonString = resultQR;
                 weather = JsonConvert.DeserializeObject<WeatherObject>(jsonString);
             }
-            weather.main.temp = KelvinConvert(weather.main.temp, tempType);
-            weather.main.temp_min = KelvinConvert(weather.main.temp_min, tempType);
-            weather.main.temp_max = KelvinConvert(weather.main.temp_max, tempType);
+
             return weather;
         }
-
-        public static int KelvinConvert(float temp, int type)
-        {
-
-            int temperature = 0;
-            //Fahrenheit Formula: (Temp − 273.15) × 9/5 + 32
-            if (type == 0)
-            {
-                temperature = (int)((temp - 273.15) * 9 / 5 + 32);
-            }
-            //Celsius Formula: (Temp − 273.15)
-            else if (type == 1)
-            {
-                temperature = (int)(temp - 273.15);
-            }
-            
-            return temperature;
-        }
-
 
     }
 }

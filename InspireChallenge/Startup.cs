@@ -25,8 +25,8 @@ namespace InspireChallenge
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddRazorPages().AddRazorRuntimeCompilation();
-
-            services.AddScoped<ServiceAPI, ServiceAPI>();
+            var appSettings = Configuration.GetSection("AppSetting").Get<Models.AppSettings>();
+            services.AddSingleton<ServiceAPI>(new ServiceAPI(appSettings.WeatherKey));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
