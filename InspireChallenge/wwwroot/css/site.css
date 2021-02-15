@@ -70,3 +70,21 @@ body {
   white-space: nowrap;
   line-height: 60px; /* Vertically center the text there */
 }
+
+button {
+    background: none;
+    border: none;
+    margin: 0;
+    padding: 0;
+    cursor: pointer;
+    color: white;
+}
+
+#change {
+    font-weight: bold;
+}
+
+.widget a:link {
+    text-decoration: none;
+    color: white;
+}

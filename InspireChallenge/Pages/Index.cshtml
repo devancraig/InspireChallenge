@@ -28,13 +28,8 @@
         background-size: cover;
     }
 
-    .widget a:link {
-        text-decoration:none;
-        color: white;
-    }
-
     #drag-1, #drag-2, #drag-3 {
-        width: 20%;
+        width: 25%;
         min-height: 6.5em;
         margin: 1rem 0 0 1rem;
         background-color: @(widgetColor);
@@ -47,16 +42,7 @@
         transform: translate(0px, 0px);
     }
 
-    button {
-        background: none;
-        border: none;
-        margin: 0;
-        padding: 0;
-        cursor: pointer;
-        color: white;
-    }
-
-    #changeBackground {
+    #change-background {
         background-color: @(widgetColor);
         color: white;
     }
@@ -66,9 +52,7 @@
 
 
 <div class="text-center">
-
     <div class="widget">
-
         <div id="drag-1" class="draggable">
             <div class="row weather">
                 <div class="col">
@@ -79,8 +63,8 @@
                 <div class="col">
                     <img id="set-weather-image" />
                     <p id="set-weather-desc"></p>
-                    <button id="changeTempF"></button>
-                    <button id="changeTempC"></button>
+                    <button id="change-temp-f"></button>
+                    <button id="change-temp-c"></button>
                 </div>
             </div>
         </div>
@@ -92,20 +76,19 @@
                 </div>
                 <h5><i id="title">- @Model.quotes[index].title.rendered</i></h5>
             </div>
-            <button id="updateQuote">New Quote?</button>
+            <button id="update-quote">New Quote?</button>
         </div>
 
         <div id="drag-3" class="draggable">
             <h5><button id="change"></button></h5>
-            <h3 id="time"></h3>
+            <h5 id="time"></h5>
             <h5>@(timeMessage)</h5>
         </div>
 
         <div id="drag-4" class="draggable">
-            <button id="changeBackground" class="btn">New Image?</button>
+            <button id="change-background" class="btn">New Image?</button>
         </div>
     </div>
-
 </div>
 
 @section Scripts {
@@ -171,19 +154,19 @@
                  startClock(0);
                  getLocation("imperial");
 
-                $('#changeBackground').click(function () {
+                $('#change-background').click(function () {
                     updateBackground();
                 });
 
-                $('#changeTempC').click(function () {
+                $('#change-temp-c').click(function () {
                     updateTemp("metric");
                 });
 
-                $('#changeTempF').click(function () {
+                $('#change-temp-f').click(function () {
                     updateTemp("imperial");
                 });
 
-                $('#updateQuote').click(function () {
+                $('#update-quote').click(function () {
                     changeQuote();
                 });
 
@@ -243,9 +226,10 @@
                 $("#set-weather-min").html("Low: " + d.main.temp_min.toFixed(0));
                 $("#set-weather-max").html("High: " + d.main.temp_max.toFixed(0));
                 $("#set-weather-image").attr("src", iconURL + d.weather[0].icon + iconType);
+                $("#set-weather-image").attr("alt", d.weather[0].description);
                 $("#set-weather-desc").html(d.weather[0].description);
-                $("#changeTempF").html("<span>&#8457;</span>");
-                $("#changeTempC").html("<span>&#8451;</span>");
+                $("#change-temp-f").html("<span>&#8457;</span>");
+                $("#change-temp-c").html("<span>&#8451;</span>");
 
             });
          }
